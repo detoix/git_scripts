@@ -9,7 +9,7 @@ do
     files_in_commit_count=${#files_in_commit[@]}
 
     if (( $files_in_commit_count < 30 ))
-    then    
+    then
         for ((i=0;i<$files_in_commit_count;i++))
         do
             file=${files_in_commit[$i]}
