@@ -33,4 +33,4 @@ do
     fi
 
     i=$i+1
-done < <(git ls-files *.cs --exclude-standard | xargs -I{} sh -c 'git blame {} --line-porcelain ; echo -_-{}' | sed -n 's/^committer-time //p;s/^\t//p;s/^-_-/-_-/p')
+done < <(git ls-files *.cs --exclude-standard | xargs -I{} sh -c 'git blame {} --line-porcelain ; echo -_-{}' | sed -n 's/^committer-time //p;s/^\t//p;s/^-_-/-_-/p' | sed 's/\\//g')
