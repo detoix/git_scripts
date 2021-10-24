@@ -7,7 +7,7 @@ file_length=0
 file_timestamp=0
 file_max_timestamp=0
 
-echo 'File' $'\t' 'File length' $'\t' 'Average last modification [timestamp]' $'\t' 'Last modification [timestamp]'
+echo 'File' $'\t' 'File length [chars]' $'\t' 'Average last modification [timestamp]' $'\t' 'Last modification [timestamp]'
 
 while read line
 do
