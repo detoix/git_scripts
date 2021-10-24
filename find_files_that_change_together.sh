@@ -31,7 +31,7 @@ do
         do
             file=${files_in_commit[$i]}
             file_commits_count[$file]=$((${file_commits_count[$file]} + 1))
-            next_i=i+1 
+            next_i=$i+1 
 
             for ((j=$next_i;j<$files_in_commit_count;j++)) 
             do
