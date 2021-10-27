@@ -75,3 +75,5 @@ done
 #git ls-files *.cs --exclude-standard | xargs -I{} grep '\{$' {} -c | paste -sd+ | bc
 
 #todo: srednia ilosc autorów 1 pliku, które foldery i jak rosną, 
+
+#it bisect start && git bisect bad && git bisect good 885350436 && git ls-files *.cs --exclude-standard | xargs -I{} grep '\{$' {} -c | paste -sd+ | bc && git bisect skip && git ls-files *.cs --exclude-standard | xargs -I{} grep '\{$' {} -c | paste -sd+ | bc && git bisect skip && git ls-files *.cs --exclude-standard | xargs -I{} grep '\{$' {} -c | paste -sd+ | bc && git bisect skip && git ls-files *.cs --exclude-standard | xargs -I{} grep '\{$' {} -c | paste -sd+ | bc && git bisect reset HEAD
