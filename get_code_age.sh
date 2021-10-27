@@ -8,12 +8,12 @@ file_curly_braces_count=0
 file_timestamp=0
 file_max_timestamp=0
 
-echo 'File'$'\t''File length [chars]'$'\t''Average last modification [timestamp]'$'\t''Last modification [timestamp]'$'\t''Leading curly braces [count]'
-
 declare -A timestamp_by_dir
 declare -A chars_by_dir
 declare -A max_timestamp_by_dir
 declare -A curly_braces_by_dir
+
+echo 'File'$'\t''File length [chars]'$'\t''Average last modification [timestamp]'$'\t''Last modification [timestamp]'$'\t''Leading curly braces [count]'
 
 while read line
 do
@@ -70,3 +70,8 @@ do
 done
 
 #git log --format=format: --name-only | egrep -v '^$' | sort | uniq -c | sort -r | head -5
+
+#count all curly braces
+#git ls-files *.cs --exclude-standard | xargs -I{} grep '\{$' {} -c | paste -sd+ | bc
+
+#todo: srednia ilosc autorów 1 pliku, które foldery i jak rosną, 

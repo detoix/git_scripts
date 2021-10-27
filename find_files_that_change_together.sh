@@ -60,3 +60,5 @@ do
     fi
 
 done
+
+#todo: jak wysoko trzeba wyjść żeby znaleźć wspólnego parenta a/b/c.cs a/d/e.cs > 2
