@@ -2,7 +2,7 @@
 
 i=0
 
-echo 'File'$'\t''File length [chars]'$'\t''Average last modification [timestamp]'$'\t''Last modification [timestamp]'$'\t''Leading curly braces [count]'
+echo 'Date'$'\t''Leading_spaces'$'\t''Lines_count'$'\t''Total_chars'
 
 while read line
 do
@@ -10,7 +10,15 @@ do
     then
         $(git checkout --quiet $line)
 
-        echo $(git ls-files *.cs --exclude-standard | xargs -I{} grep -o '^[[:blank:]]' {} | wc -c)$'\t'$(git log -1 --format=%cs)
+        files=$(echo git ls-files *.cs)
+
+        echo \
+$(git log -1 --format=%cs)\
+ \
+$($files | xargs -I{} grep -o '^[[:blank:]]*' {} | wc -c)\
+ \
+$($files | xargs -I{} cat {} | wc -ml)
+
     fi
 
     i=$i+1
