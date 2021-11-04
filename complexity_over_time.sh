@@ -29,10 +29,14 @@ do
         files=$(echo git ls-files $filter_files)
 
         echo \
-$(git log -1 --format='%cs %h') \ #date commit_hash
-$($files | xargs -I{} grep -o '^[[:blank:]]*' {} | tr -d '\n' | wc -c) \ #count leading_spaces
-$($files | xargs -I{} cat {} | wc -l) #count lines_count
+$(git log -1 --format='%cs %h') \
+$($files | xargs -I{} grep -o '^[[:blank:]]*' {} | tr -d '\n' | wc -c) \
+$($files | xargs -I{} cat {} | wc -l)
 
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#date commit_hash
+#count leading_spaces
+#count lines_count
     fi
 
     i=$i+1

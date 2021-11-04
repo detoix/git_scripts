@@ -1,5 +1,14 @@
 #!/bin/bash
 
+filter_files='*.cs'
+
+while getopts f: flag
+do
+    case "${flag}" in
+        f) filter_files=${OPTARG};;
+    esac
+done
+
 i=0
 file=0
 timestamp=0
@@ -58,10 +67,16 @@ do
     fi
 
     i=$i+1
-done < <(git ls-files *.cs | \ #list all files
-        xargs -I{} sh -c 'git blame {} --line-porcelain ; echo ~{}' | \ #print debug blame data with ~path at the end
-        sed -n 's/^committer-time //p;s/^\t//p;s/^~/~/p' | \ #keep only lines with timestamp, code and file path
-        sed 's/\\//g;s/ /_/g') #replace whitespaces with _ - required because process substitution removes leading spaces for some reason
+done < <(git ls-files $filter_files | \
+        xargs -I{} sh -c 'git blame {} --line-porcelain ; echo ~{}' | \
+        sed -n 's/^committer-time //p;s/^\t//p;s/^~/~/p' | \
+        sed 's/\\//g;s/ /_/g')
+
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#list all files
+#print debug blame data with ~path at the end
+#keep only lines with timestamp, code and file path
+#replace whitespaces with _ - required because process substitution removes leading spaces for some reason
 
 for path in "${!timestamp_by_dir[@]}" #iterate over previously prepared directories data
 do
