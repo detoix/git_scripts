@@ -1,7 +1,7 @@
 #!/bin/bash
 
 analyze_every_nth_commit=100
-browse_commit_since=1900-01-01
+browse_commit_since=1990-01-01
 max_number_of_commits=-1
 filter_files='*.cs'
 direction='--reverse'
