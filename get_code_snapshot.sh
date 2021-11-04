@@ -17,14 +17,14 @@ echo 'File' 'Lines_count' 'Average_last_modification_timestamp' 'Last_modificati
 
 while read line
 do
-    if [[ $line == *"-_-"* ]]
+    if [[ $line == *"~"* ]]
     then
         if [ $file_length != "0" ]
         then
-            path=`echo "$line" | sed -z 's/-_-//g'`
-
-            echo $path $file_length $(( $file_timestamp / $file_length )) $file_max_timestamp $file_leading_spaces
+            path="${line#?}"
             
+            echo $path $file_length $(( $file_timestamp / $file_length )) $file_max_timestamp $file_leading_spaces
+
             while [[ $path == *"/"* ]]
             do
                 path=${path%/*}
@@ -54,11 +54,14 @@ do
     then
         file_length=$(( $file_length + 1 ))
         file_timestamp=$(( $file_timestamp + $timestamp ))
-        file_leading_spaces=$(echo grep -o '^[[:blank:]]*' "$line" | wc -c)
+        file_leading_spaces=$(( $file_leading_spaces + $(echo $line | grep -o '^_*' | tr -d '\n' | wc -c) ))       
     fi
 
     i=$i+1
-done < <(git ls-files *.cs | xargs -I{} sh -c 'git blame {} --line-porcelain ; echo -_-{}' | sed -n 's/^committer-time //p;s/^\t//p;s/^-_-/-_-/p' | sed 's/\\//g')
+done < <(git ls-files **ConcatTest.cs | \
+        xargs -I{} sh -c 'git blame {} --line-porcelain ; echo ~{}' | \
+        sed -n 's/^committer-time //p;s/^\t//p;s/^~/~/p' | \
+        sed 's/\\//g;s/ /_/g')
 
 for path in "${!timestamp_by_dir[@]}"
 do
