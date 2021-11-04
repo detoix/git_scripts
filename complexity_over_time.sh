@@ -20,18 +20,18 @@ done
 echo 'Date' 'Commit_hash' 'Leading_spaces' 'Lines_count'
 
 i=0
-while read line
+while read commit_hash
 do
     if (( i % $analyze_every_nth_commit == 0 ))
     then
-        $(git checkout -f --quiet $line)
+        $(git checkout -f --quiet $commit_hash)
 
         files=$(echo git ls-files $filter_files)
 
         echo \
-$(git log -1 --format='%cs %h') \
-$($files | xargs -I{} grep -o '^[[:blank:]]*' {} | tr -d '\n' | wc -c) \
-$($files | xargs -I{} cat {} | wc -l)
+$(git log -1 --format='%cs %h') \ #date commit_hash
+$($files | xargs -I{} grep -o '^[[:blank:]]*' {} | tr -d '\n' | wc -c) \ #count leading_spaces
+$($files | xargs -I{} cat {} | wc -l) #count lines_count
 
     fi
 
