@@ -83,6 +83,57 @@ do
     echo $path ${chars_by_dir[$path]} $(( ${timestamp_by_dir[$path]} / ${chars_by_dir[$path]} )) ${max_timestamp_by_dir[$path]} ${leading_spaces_by_dir[$path]}
 done
 
+# declare -A arr
+
+# x=0
+# y=0
+# max_depth=0
+
+# while read path
+# do
+#     depth=($(echo $path | grep -o '/' | tr -d '\n' | wc -c))
+#     max_depth=$(( $depth > $max_depth ? $depth : $max_depth ))
+#     arr[$x,$depth]=$path
+
+#     printf $path
+#     printf '\t'
+
+#     x=$(( $x+1 ))
+# done < <(echo ${!leading_spaces_by_dir[@]} | tr " " "\n" | sort)
+
+# echo ''
+
+# for (( j=0; j<=$max_depth; j++ ))
+# do 
+#     for i in $(seq 0 ${#arr[@]})
+#     do
+#         if [ ! -z ${arr[$i,$j]} ]
+#         then
+#             printf ${leading_spaces_by_dir[${arr[$i,$j]}]}
+#         elif [ $j != 0 ] && [ ! -z ${arr[$i,$(($j-1))]} ]
+#         then
+#             row_above=$(( $j - 1 ))
+#             sum_in_this_dir=0
+#             forward_iterator=$(( $i + 1 ))
+#             while [ -z ${arr[$forward_iterator,$(($j-1))]} ] && [ $forward_iterator -lt ${#arr[@]} ]
+#             do
+#                 if [ ! -z ${arr[$forward_iterator,$j]} ]
+#                 then
+#                     sum_in_this_dir=$(( $sum_in_this_dir + ${leading_spaces_by_dir[${arr[$forward_iterator,$j]}]} ))
+#                 fi
+
+#                 forward_iterator=$(( $forward_iterator + 1 ))
+#             done
+
+#             printf $(( ${leading_spaces_by_dir[${arr[$i,$(($j-1))]}]} - $sum_in_this_dir ))
+#         fi
+        
+#         printf '\t'
+#     done
+
+#     echo ''
+# done
+
 #git log --format=format: --name-only | egrep -v '^$' | sort | uniq -c | sort -r | head -5
 
 #todo: srednia ilosc autorów 1 pliku
