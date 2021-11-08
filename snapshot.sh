@@ -83,54 +83,53 @@ do
     echo $path ${chars_by_dir[$path]} $(( ${timestamp_by_dir[$path]} / ${chars_by_dir[$path]} )) ${max_timestamp_by_dir[$path]} ${leading_spaces_by_dir[$path]}
 done
 
-# declare -A arr
+# declare -A directories_2d_array #declare structure expected by diagram
 
-# x=0
-# y=0
+# i=0
 # max_depth=0
 
 # while read path
 # do
-#     depth=($(echo $path | grep -o '/' | tr -d '\n' | wc -c))
+#     depth=($(echo $path | grep -o '/' | tr -d '\n' | wc -c)) #count directory depth
 #     max_depth=$(( $depth > $max_depth ? $depth : $max_depth ))
-#     arr[$x,$depth]=$path
+#     directories_2d_array[$i,$depth]=$path
 
-#     printf $path
-#     printf '\t'
+#     printf $path #print spreadsheet header
+#     printf '\t'  #separated with tabs
 
-#     x=$(( $x+1 ))
-# done < <(echo ${!leading_spaces_by_dir[@]} | tr " " "\n" | sort)
+#     i=$(( $i+1 ))
+# done < <(echo ${!leading_spaces_by_dir[@]} | tr " " "\n" | sort) #loop through all stored directories sorted as strings
 
-# echo ''
+# echo '' #break line
 
 # for (( j=0; j<=$max_depth; j++ ))
 # do 
-#     for i in $(seq 0 ${#arr[@]})
+#     for i in $(seq 0 ${#directories_2d_array[@]}) #loop through all columns
 #     do
-#         if [ ! -z ${arr[$i,$j]} ]
+#         if [ ! -z ${directories_2d_array[$i,$j]} ] #current value is calculated directly
 #         then
-#             printf ${leading_spaces_by_dir[${arr[$i,$j]}]}
-#         elif [ $j != 0 ] && [ ! -z ${arr[$i,$(($j-1))]} ]
+#             printf ${leading_spaces_by_dir[${directories_2d_array[$i,$j]}]} #print value for directory in current place in 2d array
+#         elif [ $j != 0 ] && [ ! -z ${directories_2d_array[$i,$(($j-1))]} ] #there's anything in parent directory (above)
 #         then
-#             sum_in_this_dir=0
+#             sum_in_this_dir_children=0
 #             forward_iterator=$(( $i + 1 ))
-#             while [ -z ${arr[$forward_iterator,$(($j-1))]} ] && [ $forward_iterator -lt ${#arr[@]} ]
+#             while [ -z ${directories_2d_array[$forward_iterator,$(($j-1))]} ] && [ $forward_iterator -lt ${#directories_2d_array[@]} ] #loop through any possible children of current directory until reach end of 2d array
 #             do
-#                 if [ ! -z ${arr[$forward_iterator,$j]} ]
+#                 if [ ! -z ${directories_2d_array[$forward_iterator,$j]} ] #any child containing value
 #                 then
-#                     sum_in_this_dir=$(( $sum_in_this_dir + ${leading_spaces_by_dir[${arr[$forward_iterator,$j]}]} ))
+#                     sum_in_this_dir_children=$(( $sum_in_this_dir_children + ${leading_spaces_by_dir[${directories_2d_array[$forward_iterator,$j]}]} )) #aggregate sum
 #                 fi
 
 #                 forward_iterator=$(( $forward_iterator + 1 ))
 #             done
 
-#             current_value=$(( ${leading_spaces_by_dir[${arr[$i,$(($j-1))]}]} - $sum_in_this_dir ))
+#             current_value=$(( ${leading_spaces_by_dir[${directories_2d_array[$i,$(($j-1))]}]} - $sum_in_this_dir_children ))
 
-#             if [ $current_value -gt 0 ]
+#             if [ $current_value -gt 0 ] #anything in this directory
 #             then
-#                 next_level="${arr[$i,$(($j-1))]}-${j}"
-#                 arr[$i,$j]=$next_level
-#                 leading_spaces_by_dir[$next_level]=$current_value
+#                 next_level="${directories_2d_array[$i,$(($j-1))]}-${j}" #create some key for cell in row below
+#                 directories_2d_array[$i,$j]=$next_level #assign fake key so it appears in loop through row below
+#                 leading_spaces_by_dir[$next_level]=$current_value #assign value to fake key so it it used in loop through row below
 #             fi
 
 #             printf $current_value
