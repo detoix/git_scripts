@@ -2,10 +2,11 @@
 
 filter_files='*.cs'
 
-while getopts f: flag
+while getopts f:r flag
 do
     case "${flag}" in
         f) filter_files=${OPTARG};;
+        r) print_raw_data=true;;
     esac
 done
 
@@ -22,7 +23,10 @@ declare -A chars_by_dir
 declare -A max_timestamp_by_dir
 declare -A leading_spaces_by_dir
 
-echo 'File' 'Lines_count' 'Average_last_modification_timestamp' 'Last_modification_timestamp' 'Leading_spaces'
+if [ $print_raw_data ]
+then
+    echo 'File' 'Lines_count' 'Average_last_modification_timestamp' 'Last_modification_timestamp' 'Leading_spaces'
+fi
 
 while read line
 do
@@ -32,7 +36,10 @@ do
         then
             path="${line#?}" #remove leading ~ from file path
             
-            echo $path $file_length $(( $file_timestamp / $file_length )) $file_max_timestamp $file_leading_spaces #report single file data
+            if [ $print_raw_data ]
+            then
+                echo $path $file_length $(( $file_timestamp / $file_length )) $file_max_timestamp $file_leading_spaces #report single file data
+            fi
 
             while [[ $path == *"/"* ]] #iterate recursively to parent directory
             do
@@ -78,10 +85,15 @@ done < <(git ls-files $filter_files | \
 #keep only lines with timestamp, code and file path
 #replace whitespaces with _ - required because process substitution removes leading spaces for some reason
 
-for path in "${!timestamp_by_dir[@]}" #iterate over previously prepared directories data
-do
-    echo $path ${chars_by_dir[$path]} $(( ${timestamp_by_dir[$path]} / ${chars_by_dir[$path]} )) ${max_timestamp_by_dir[$path]} ${leading_spaces_by_dir[$path]}
-done
+if [ $print_raw_data ]
+then
+    for path in "${!leading_spaces_by_dir[@]}" #iterate over previously prepared directories data
+    do
+        echo $path ${chars_by_dir[$path]} $(( ${timestamp_by_dir[$path]} / ${chars_by_dir[$path]} )) ${max_timestamp_by_dir[$path]} ${leading_spaces_by_dir[$path]}
+    done
+
+    exit 1
+fi
 
 # declare -A directories_2d_array #declare structure expected by diagram
 
