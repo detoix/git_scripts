@@ -96,9 +96,14 @@ then
 fi
 
 declare -A directories_2d_array #declare structure expected by diagram
+declare -A data_source
 
 i=0
 max_depth=0
+
+for key in ${!leading_spaces_by_dir[@]}; do #keys are the same for any data array
+    data_source["$key"]="${chars_by_dir["$key"]}"
+done
 
 while read path
 do
@@ -110,7 +115,7 @@ do
     printf '\t'  #separated with tabs
 
     i=$(( $i+1 ))
-done < <(echo ${!leading_spaces_by_dir[@]} | tr " " "\n" | sort) #loop through all stored directories sorted as strings
+done < <(echo ${!data_source[@]} | tr " " "\n" | sort) #loop through all stored directories sorted as strings
 
 echo '' #break line
 
@@ -120,7 +125,7 @@ do
     do
         if [ ! -z ${directories_2d_array[$i,$j]} ] #current value is calculated directly
         then
-            printf ${leading_spaces_by_dir[${directories_2d_array[$i,$j]}]} #print value for directory in current place in 2d array
+            printf ${data_source[${directories_2d_array[$i,$j]}]} #print value for directory in current place in 2d array
         elif [ $j != 0 ] && [ ! -z ${directories_2d_array[$i,$(($j-1))]} ] #there's anything in parent directory (above)
         then
             sum_in_this_dir_children=0
@@ -129,19 +134,19 @@ do
             do
                 if [ ! -z ${directories_2d_array[$forward_iterator,$j]} ] #any child containing value
                 then
-                    sum_in_this_dir_children=$(( $sum_in_this_dir_children + ${leading_spaces_by_dir[${directories_2d_array[$forward_iterator,$j]}]} )) #aggregate sum
+                    sum_in_this_dir_children=$(( $sum_in_this_dir_children + ${data_source[${directories_2d_array[$forward_iterator,$j]}]} )) #aggregate sum
                 fi
 
                 forward_iterator=$(( $forward_iterator + 1 ))
             done
 
-            current_value=$(( ${leading_spaces_by_dir[${directories_2d_array[$i,$(($j-1))]}]} - $sum_in_this_dir_children ))
+            current_value=$(( ${data_source[${directories_2d_array[$i,$(($j-1))]}]} - $sum_in_this_dir_children ))
 
             if [ $current_value -gt 0 ] #anything in this directory
             then
                 next_level="${directories_2d_array[$i,$(($j-1))]}-${j}" #create some key for cell in row below
                 directories_2d_array[$i,$j]=$next_level #assign fake key so it appears in loop through row below
-                leading_spaces_by_dir[$next_level]=$current_value #assign value to fake key so it it used in loop through row below
+                data_source[$next_level]=$current_value #assign value to fake key so it it used in loop through row below
             fi
 
             printf $current_value
