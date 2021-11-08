@@ -112,7 +112,6 @@ done
 #             printf ${leading_spaces_by_dir[${arr[$i,$j]}]}
 #         elif [ $j != 0 ] && [ ! -z ${arr[$i,$(($j-1))]} ]
 #         then
-#             row_above=$(( $j - 1 ))
 #             sum_in_this_dir=0
 #             forward_iterator=$(( $i + 1 ))
 #             while [ -z ${arr[$forward_iterator,$(($j-1))]} ] && [ $forward_iterator -lt ${#arr[@]} ]
@@ -125,7 +124,16 @@ done
 #                 forward_iterator=$(( $forward_iterator + 1 ))
 #             done
 
-#             printf $(( ${leading_spaces_by_dir[${arr[$i,$(($j-1))]}]} - $sum_in_this_dir ))
+#             current_value=$(( ${leading_spaces_by_dir[${arr[$i,$(($j-1))]}]} - $sum_in_this_dir ))
+
+#             if [ $current_value -gt 0 ]
+#             then
+#                 next_level="${arr[$i,$(($j-1))]}-${j}"
+#                 arr[$i,$j]=$next_level
+#                 leading_spaces_by_dir[$next_level]=$current_value
+#             fi
+
+#             printf $current_value
 #         fi
         
 #         printf '\t'
