@@ -31,11 +31,11 @@ fi
 
 while read line
 do
-    if [ "${line:0:1}" = "~" ] && (( $metadata_iterator % 2 == 0))
+    if [ "${line:0:1}" = "~" ] && (( $metadata_iterator % 2 == 0 ))
     then
         file_leading_spaces="${line#?}"
         metadata_iterator=$(( $metadata_iterator+1 ))
-    elif [ "${line:0:1}" = "~" ] && [[ $line == *"~"* ]] #file path is prefixed with ~
+    elif [ "${line:0:1}" = "~" ] && (( $metadata_iterator % 2 == 1 )) #file path is prefixed with ~
     then
         if [ $file_length != "0" ] #avoid division by zero
         then
@@ -76,7 +76,6 @@ do
     then
         file_length=$(( $file_length + 1 ))
         file_timestamp=$(( $file_timestamp + $timestamp ))
-        file_leading_spaces=$(( $file_leading_spaces + $(echo $line | grep -o '^_*' | tr -d '\n' | wc -c) ))       
     fi
 
     i=$i+1
