@@ -20,7 +20,7 @@ file_timestamp=0
 file_max_timestamp=0
 
 declare -A timestamp_by_dir
-declare -A chars_by_dir
+declare -A lines_by_dir
 declare -A max_timestamp_by_dir
 declare -A leading_spaces_by_dir
 
@@ -50,7 +50,7 @@ do
             do
                 path=${path%/*} #jump to parent directory
                 timestamp_by_dir[$path]=$((${timestamp_by_dir[$path]} + $file_timestamp))
-                chars_by_dir[$path]=$((${chars_by_dir[$path]} + $file_length))
+                lines_by_dir[$path]=$((${lines_by_dir[$path]} + $file_length))
                 leading_spaces_by_dir[$path]=$((${leading_spaces_by_dir[$path]} + $file_leading_spaces))
 
                 if [ -z "${max_timestamp_by_dir[$path]}" ] #set if does not exist, required because of some bug
@@ -94,7 +94,7 @@ if [ $print_raw_data ]
 then
     for path in "${!leading_spaces_by_dir[@]}" #iterate over previously prepared directories data
     do
-        echo $path ${chars_by_dir[$path]} $(( ${timestamp_by_dir[$path]} / ${chars_by_dir[$path]} )) ${max_timestamp_by_dir[$path]} ${leading_spaces_by_dir[$path]}
+        echo $path ${lines_by_dir[$path]} $(( ${timestamp_by_dir[$path]} / ${lines_by_dir[$path]} )) ${max_timestamp_by_dir[$path]} ${leading_spaces_by_dir[$path]}
     done
 
     exit 1
@@ -107,7 +107,7 @@ i=0
 max_depth=0
 
 for key in ${!leading_spaces_by_dir[@]}; do #keys are the same for any data array
-    data_source["$key"]="${chars_by_dir["$key"]}"
+    data_source["$key"]="${lines_by_dir["$key"]}"
 done
 
 while read path
@@ -120,7 +120,7 @@ do
     printf '\t'  #separated with tabs
 
     i=$(( $i+1 ))
-done < <(echo ${!data_source[@]} | tr " " "\n" | sort) #loop through all stored directories sorted as strings
+done < <(echo ${!data_source[@]} | tr " " "\n" | sed 's/\//,/g' | sort | sed 's/,/\//g') #loop through all stored directories sorted as strings
 
 echo '' #break line
 
