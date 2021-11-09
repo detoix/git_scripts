@@ -11,6 +11,7 @@ do
 done
 
 i=0
+metadata_iterator=0
 file=0
 timestamp=0
 file_length=0
@@ -30,7 +31,11 @@ fi
 
 while read line
 do
-    if [[ $line == *"~"* ]] #file path is prefixed with ~
+    if [ "${line:0:1}" = "~" ] && (( $metadata_iterator % 2 == 0))
+    then
+        file_leading_spaces="${line#?}"
+        metadata_iterator=$(( $metadata_iterator+1 ))
+    elif [ "${line:0:1}" = "~" ] && [[ $line == *"~"* ]] #file path is prefixed with ~
     then
         if [ $file_length != "0" ] #avoid division by zero
         then
@@ -58,6 +63,7 @@ do
         fi
 
         i=-1 #return iterator to odd for next file
+        metadata_iterator=0
         file_length=0
         file_timestamp=0
         file_max_timestamp=0
@@ -75,7 +81,7 @@ do
 
     i=$i+1
 done < <(git ls-files $filter_files | \
-        xargs -I{} sh -c 'git blame {} --line-porcelain ; echo ~{}' | \
+        xargs -I{} sh -c 'git blame {} --line-porcelain ; echo ~`grep -o '^[[:blank:]]*' {} | tr -d "\n" | wc -c` ; echo ~{}' | \
         sed -n 's/^committer-time //p;s/^\t//p;s/^~/~/p' | \
         sed 's/\\//g;s/ /_/g')
 
