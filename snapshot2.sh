@@ -104,6 +104,27 @@ done < <(printf '%s\n' "${!data_source[@]}" | sed 's/\//,/g' | sort | sed 's/,/\
 
 echo '' #break line
 
+# for i in $(seq 0 ${#directories_2d_array[@]}) #loop through all columns
+# do
+#     for (( j=0; j<$max_depth; j++ ))
+#     do
+#         if [ ! -z "${directories_2d_array[$i,$j]}" ] #current value is calculated directly
+#         then
+#             printf "%s,%s" $(echo "${directories_2d_array[$i,$j]}")
+
+#             for (( k=$j, k<$max_depth; k++ ))
+#             do
+#                 printf ','
+#             done
+
+#             printf "${lines_by_dir["${directories_2d_array[$i,$j]}"]}"
+#             printf ","
+#             printf "${data_source["${directories_2d_array[$i,$j]}"]}"
+#             printf "\n"
+#         fi
+#     done
+# done
+
 for (( j=0; j<=$max_depth; j++ ))
 do 
     for i in $(seq 0 ${#directories_2d_array[@]}) #loop through all columns
