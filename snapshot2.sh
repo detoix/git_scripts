@@ -93,7 +93,7 @@ while read path
 do
     depth=($(echo $path | grep -o '/' | tr -d '\n' | wc -c)) #count directory depth
     max_depth=$(( $depth > $max_depth ? $depth : $max_depth ))
-    directories_2d_array[$i,$depth]=$path
+    directories_2d_array[$i,$depth]="$path"
 
     printf "$path" #print spreadsheet header
     printf '\t'  #separated with tabs
@@ -109,22 +109,22 @@ do
     do
         if [ ! -z "${directories_2d_array[$i,$j]}" ] #current value is calculated directly
         then
-            printf ${data_source[${directories_2d_array[$i,$j]}]} #print value for directory in current place in 2d array
-        elif [ $j != 0 ] && [ ! -z ${directories_2d_array[$i,$(($j-1))]} ] #there's anything in parent directory (above)
+            printf "${data_source["${directories_2d_array[$i,$j]}"]}" #print value for directory in current place in 2d array
+        elif [ $j != 0 ] && [ ! -z "${directories_2d_array[$i,$(($j-1))]}" ] #there's anything in parent directory (above)
         then
             sum_in_this_dir_children=0
             forward_iterator=$(( $i + 1 ))
-            while [ -z ${directories_2d_array[$forward_iterator,$(($j-1))]} ] && [ $forward_iterator -lt ${#directories_2d_array[@]} ] #loop through any possible children of current directory until reach end of 2d array
+            while [ -z "${directories_2d_array[$forward_iterator,$(($j-1))]}" ] && [ $forward_iterator -lt "${#directories_2d_array[@]}" ] #loop through any possible children of current directory until reach end of 2d array
             do
-                if [ ! -z ${directories_2d_array[$forward_iterator,$j]} ] #any child containing value
+                if [ ! -z "${directories_2d_array[$forward_iterator,$j]}" ] #any child containing value
                 then
-                    sum_in_this_dir_children=$(( $sum_in_this_dir_children + ${data_source[${directories_2d_array[$forward_iterator,$j]}]} )) #aggregate sum
+                    sum_in_this_dir_children=$(( $sum_in_this_dir_children + "${data_source["${directories_2d_array[$forward_iterator,$j]}"]}" )) #aggregate sum
                 fi
 
                 forward_iterator=$(( $forward_iterator + 1 ))
             done
 
-            current_value=$(( ${data_source[${directories_2d_array[$i,$(($j-1))]}]} - $sum_in_this_dir_children ))
+            current_value=$(( "${data_source["${directories_2d_array[$i,$(($j-1))]}"]}" - $sum_in_this_dir_children ))
 
             if [ $current_value -gt 0 ] #anything in this directory
             then
