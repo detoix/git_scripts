@@ -1,6 +1,6 @@
 #!/bin/bash
 
-filter_files='**samples**.cs'
+filter_files='*.cs'
 
 while getopts f:rlca flag
 do
@@ -49,15 +49,15 @@ do
 
         while [[ "$path" == *"/"* ]] #iterate recursively to parent directory
         do
-            path=${path%/*} #jump to parent directory
-            timestamp_by_dir[$path]=$((${timestamp_by_dir[$path]} + $file_timestamp * $file_length))
-            lines_by_dir[$path]=$((${lines_by_dir[$path]} + $file_length))
-            leading_spaces_by_dir[$path]=$((${leading_spaces_by_dir[$path]} + $file_leading_spaces))
+            path="${path%/*}" #jump to parent directory
+            timestamp_by_dir["$path"]=$((${timestamp_by_dir["$path"]} + $file_timestamp * $file_length))
+            lines_by_dir["$path"]=$((${lines_by_dir["$path"]} + $file_length))
+            leading_spaces_by_dir["$path"]=$((${leading_spaces_by_dir["$path"]} + $file_leading_spaces))
         done
     fi
 
     i=$i+1
-done < <(git ls-files *.cs | xargs -I{} sh -c 'git log -1 --format=%ct {} ; cat {} | wc -l ; grep -o '^[[:blank:]]*' {} | tr -d '\n' | wc -c ; echo {}')
+done < <(git ls-files "$filter_files" | xargs -I{} sh -c 'git log -1 --format=%ct "{}" ; cat "{}" | wc -l ; grep -o '^[[:blank:]]*' "{}" | tr -d "\n" | wc -c ; echo "{}"')
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #list all files
@@ -78,7 +78,8 @@ for key in ${!leading_spaces_by_dir[@]}; do #keys are the same for any data arra
         data_source["$key"]="${lines_by_dir["$key"]}"
     elif [ $print_complexity ]
     then
-        data_source["$key"]=$(( ${leading_spaces_by_dir["$key"]} / ${lines_by_dir["$key"]} ))
+        leading_spaces_per_line=$(( ${leading_spaces_by_dir["$key"]} / ${lines_by_dir["$key"]} ))
+        data_source["$key"]=$(( $leading_spaces_per_line * $leading_spaces_per_line ))
     elif [ $print_age ]
     then
         directory_age_in_secons=$(( ${timestamp_by_dir["$key"]} / ${lines_by_dir["$key"]} ))
@@ -94,11 +95,11 @@ do
     max_depth=$(( $depth > $max_depth ? $depth : $max_depth ))
     directories_2d_array[$i,$depth]=$path
 
-    printf $path #print spreadsheet header
+    printf "$path" #print spreadsheet header
     printf '\t'  #separated with tabs
 
     i=$(( $i+1 ))
-done < <(echo ${!data_source[@]} | tr " " "\n" | sort) #loop through all stored directories sorted as strings
+done < <(printf '%s\n' "${!data_source[@]}" | sed 's/\//,/g' | sort | sed 's/,/\//g') #loop through all stored directories sorted as strings
 
 echo '' #break line
 
@@ -106,7 +107,7 @@ for (( j=0; j<=$max_depth; j++ ))
 do 
     for i in $(seq 0 ${#directories_2d_array[@]}) #loop through all columns
     do
-        if [ ! -z ${directories_2d_array[$i,$j]} ] #current value is calculated directly
+        if [ ! -z "${directories_2d_array[$i,$j]}" ] #current value is calculated directly
         then
             printf ${data_source[${directories_2d_array[$i,$j]}]} #print value for directory in current place in 2d array
         elif [ $j != 0 ] && [ ! -z ${directories_2d_array[$i,$(($j-1))]} ] #there's anything in parent directory (above)

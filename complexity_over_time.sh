@@ -30,7 +30,7 @@ do
 
         echo \
 $(git log -1 --format='%cs %h') \
-$($files | xargs -I{} grep -o '^[[:blank:]]*' {} | tr -d '\n' | wc -c) \
+$($files | xargs -I{} grep -o '^[[:blank:]]*' {} | tr -d "\n" | wc -c) \
 $($files | xargs -I{} cat {} | wc -l)
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
