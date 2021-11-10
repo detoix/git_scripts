@@ -72,8 +72,9 @@ i=0
 max_depth=0
 timestamp=$(date +%s)
 
-for key in ${!leading_spaces_by_dir[@]}; do #keys are the same for any data array
-    if [ $print_lines ]
+for key in "${!leading_spaces_by_dir[@]}" #keys are the same for any data array
+do
+    if [ $print_lines ] || [ -z "${lines_by_dir["$key"]}" ] || [ "${lines_by_dir["$key"]}" = "0" ]
     then
         data_source["$key"]="${lines_by_dir["$key"]}"
     elif [ $print_complexity ]
