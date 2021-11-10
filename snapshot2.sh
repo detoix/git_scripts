@@ -106,7 +106,7 @@ echo '' #break line
 
 # for i in $(seq 0 ${#directories_2d_array[@]}) #loop through all columns
 # do
-#     for (( j=0; j<$max_depth; j++ ))
+#     for (( j=0; j<=$max_depth; j++ ))
 #     do
 #         if [ ! -z "${directories_2d_array[$i,$j]}" ] #current value is calculated directly
 #         then
