@@ -110,11 +110,11 @@ echo '' #break line
 #     do
 #         if [ ! -z "${directories_2d_array[$i,$j]}" ] #current value is calculated directly
 #         then
-#             printf "%s,%s" $(echo "${directories_2d_array[$i,$j]}")
+#             printf "${directories_2d_array[$i,$j]}"
 
-#             for (( k=$j, k<$max_depth; k++ ))
+#             for (( k=$j; k<=$max_depth; k++ ))
 #             do
-#                 printf ','
+#                 printf ","
 #             done
 
 #             printf "${lines_by_dir["${directories_2d_array[$i,$j]}"]}"
