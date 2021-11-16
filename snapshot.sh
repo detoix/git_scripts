@@ -88,7 +88,12 @@ done < <(printf '%s\n' "${!lines_by_dir[@]}" | sed 's/\//,/g' | sort | sed 's/,/
 
 if [ $print_complexity ]
 then
-    echo 'Header' #header
+    for (( j=0; j<=$max_depth; j++ ))
+    do
+        printf ","
+    done
+
+    echo "Lines count, Complexity^2, Age" #print spreadsheet header
 
     for i in $(seq 0 ${#directories_2d_array[@]}) #loop through all columns
     do
