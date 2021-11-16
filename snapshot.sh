@@ -2,14 +2,13 @@
 
 filter_files='*.cs'
 
-while getopts f:rlca flag
+while getopts f:rlc flag
 do
     case "${flag}" in
         f) filter_files=${OPTARG};;
         r) print_raw_data=true;;
         l) print_lines=true;;
         c) print_complexity=true;;
-        a) print_age=true;;
     esac
 done
 
@@ -72,97 +71,96 @@ i=0
 max_depth=0
 timestamp=$(date +%s)
 
-for key in "${!leading_spaces_by_dir[@]}" #keys are the same for any data array
-do
-    if [ $print_lines ] || [ -z "${lines_by_dir["$key"]}" ] || [ "${lines_by_dir["$key"]}" = "0" ]
-    then
-        data_source["$key"]="${lines_by_dir["$key"]}"
-    elif [ $print_complexity ]
-    then
-        leading_spaces_per_line=$(( ${leading_spaces_by_dir["$key"]} / ${lines_by_dir["$key"]} ))
-        data_source["$key"]=$(( $leading_spaces_per_line * $leading_spaces_per_line ))
-    elif [ $print_age ]
-    then
-        directory_age_in_secons=$(( ${timestamp_by_dir["$key"]} / ${lines_by_dir["$key"]} ))
-        age_in_seconds=$(( $timestamp - $directory_age_in_secons ))
-        age_in_days=$(( $age_in_seconds / 86400 ))
-        data_source["$key"]="$age_in_days"
-    fi
-done
-
 while read path
 do
     depth=($(echo $path | grep -o '/' | tr -d '\n' | wc -c)) #count directory depth
     max_depth=$(( $depth > $max_depth ? $depth : $max_depth ))
     directories_2d_array[$i,$depth]="$path"
 
-    printf "$path" #print spreadsheet header
-    printf '\t'  #separated with tabs
+    if [ $print_lines ]
+    then
+        printf "$path" #print spreadsheet header
+        printf '\t'  #separated with tabs
+    fi
 
     i=$(( $i+1 ))
-done < <(printf '%s\n' "${!data_source[@]}" | sed 's/\//,/g' | sort | sed 's/,/\//g') #loop through all stored directories sorted as strings
+done < <(printf '%s\n' "${!lines_by_dir[@]}" | sed 's/\//,/g' | sort | sed 's/,/\//g') #loop through all stored directories sorted as strings
 
-echo '' #break line
+if [ $print_complexity ]
+then
+    echo 'Header' #header
 
-# for i in $(seq 0 ${#directories_2d_array[@]}) #loop through all columns
-# do
-#     for (( j=0; j<=$max_depth; j++ ))
-#     do
-#         if [ ! -z "${directories_2d_array[$i,$j]}" ] #current value is calculated directly
-#         then
-#             printf "${directories_2d_array[$i,$j]}"
-
-#             for (( k=$j; k<=$max_depth; k++ ))
-#             do
-#                 printf ","
-#             done
-
-#             printf "${lines_by_dir["${directories_2d_array[$i,$j]}"]}"
-#             printf ","
-#             printf "${data_source["${directories_2d_array[$i,$j]}"]}"
-#             printf "\n"
-#         fi
-#     done
-# done
-
-for (( j=0; j<=$max_depth; j++ ))
-do 
     for i in $(seq 0 ${#directories_2d_array[@]}) #loop through all columns
     do
-        if [ ! -z "${directories_2d_array[$i,$j]}" ] #current value is calculated directly
-        then
-            printf "${data_source["${directories_2d_array[$i,$j]}"]}" #print value for directory in current place in 2d array
-        elif [ $j != 0 ] && [ ! -z "${directories_2d_array[$i,$(($j-1))]}" ] #there's anything in parent directory (above)
-        then
-            sum_in_this_dir_children=0
-            forward_iterator=$(( $i + 1 ))
-            while [ -z "${directories_2d_array[$forward_iterator,$(($j-1))]}" ] && [ $forward_iterator -lt "${#directories_2d_array[@]}" ] #loop through any possible children of current directory until reach end of 2d array
-            do
-                if [ ! -z "${directories_2d_array[$forward_iterator,$j]}" ] #any child containing value
+        for (( j=0; j<=$max_depth; j++ ))
+        do
+            if [ ! -z "${directories_2d_array[$i,$j]}" ] #current value is calculated directly
+            then
+                printf "${directories_2d_array[$i,$j]}"
+
+                for (( k=$j; k<=$max_depth; k++ ))
+                do
+                    printf ","
+                done
+
+                lines_count="${lines_by_dir["${directories_2d_array[$i,$j]}"]}"
+                leading_spaces_per_line=$(( ${leading_spaces_by_dir["${directories_2d_array[$i,$j]}"]} / $lines_count ))
+                leading_spaces_per_line_squared=$(( $leading_spaces_per_line * $leading_spaces_per_line ))
+                directory_age_in_seconds=$(( ${timestamp_by_dir["${directories_2d_array[$i,$j]}"]} / $lines_count ))
+                age_in_seconds=$(( $timestamp - $directory_age_in_seconds ))
+                age_in_days=$(( $age_in_seconds / 86400 ))
+
+                printf "$lines_count"
+                printf ","
+                printf "$leading_spaces_per_line_squared"
+                printf ","
+                printf "$age_in_days"
+                printf "\n"
+            fi
+        done
+    done
+fi
+
+if [ $print_lines ]
+then
+    echo '' #break line
+
+    for (( j=0; j<=$max_depth; j++ ))
+    do 
+        for i in $(seq 0 ${#directories_2d_array[@]}) #loop through all columns
+        do
+            if [ ! -z "${directories_2d_array[$i,$j]}" ] #current value is calculated directly
+            then
+                printf "${lines_by_dir["${directories_2d_array[$i,$j]}"]}" #print value for directory in current place in 2d array
+            elif [ $j != 0 ] && [ ! -z "${directories_2d_array[$i,$(($j-1))]}" ] #there's anything in parent directory (above)
+            then
+                sum_in_this_dir_children=0
+                forward_iterator=$(( $i + 1 ))
+                while [ -z "${directories_2d_array[$forward_iterator,$(($j-1))]}" ] && [ $forward_iterator -lt "${#directories_2d_array[@]}" ] #loop through any possible children of current directory until reach end of 2d array
+                do
+                    if [ ! -z "${directories_2d_array[$forward_iterator,$j]}" ] #any child containing value
+                    then
+                        sum_in_this_dir_children=$(( $sum_in_this_dir_children + "${lines_by_dir["${directories_2d_array[$forward_iterator,$j]}"]}" )) #aggregate sum
+                    fi
+
+                    forward_iterator=$(( $forward_iterator + 1 ))
+                done
+
+                current_value=$(( "${lines_by_dir["${directories_2d_array[$i,$(($j-1))]}"]}" - $sum_in_this_dir_children ))
+
+                if [ $current_value -gt 0 ] #anything in this directory
                 then
-                    sum_in_this_dir_children=$(( $sum_in_this_dir_children + "${data_source["${directories_2d_array[$forward_iterator,$j]}"]}" )) #aggregate sum
+                    next_level="${directories_2d_array[$i,$(($j-1))]}-${j}" #create some key for cell in row below
+                    directories_2d_array[$i,$j]=$next_level #assign fake key so it appears in loop through row below
+                    lines_by_dir[$next_level]=$current_value #assign value to fake key so it it used in loop through row below
                 fi
 
-                forward_iterator=$(( $forward_iterator + 1 ))
-            done
-
-            current_value=$(( "${data_source["${directories_2d_array[$i,$(($j-1))]}"]}" - $sum_in_this_dir_children ))
-
-            if [ $current_value -gt 0 ] #anything in this directory
-            then
-                next_level="${directories_2d_array[$i,$(($j-1))]}-${j}" #create some key for cell in row below
-                directories_2d_array[$i,$j]=$next_level #assign fake key so it appears in loop through row below
-                data_source[$next_level]=$current_value #assign value to fake key so it it used in loop through row below
-            fi
-
-            if [ $print_lines ]
-            then
                 printf $current_value
             fi
-        fi
-        
-        printf '\t'
-    done
+            
+            printf '\t'
+        done
 
-    echo ''
-done
+        echo ''
+    done
+fi
