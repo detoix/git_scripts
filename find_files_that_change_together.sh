@@ -55,6 +55,6 @@ do
             fi
         done
 
-        echo $pair','$shared_commits',shared commits,'$equal_chars'path similarity'
+        echo $pair','$shared_commits',shared commits,'$equal_chars',path similarity'
     fi
 done
