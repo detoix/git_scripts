@@ -14,7 +14,6 @@ do
 done
 
 declare -A file_pair_commits_count
-declare -A file_commits_count
 
 while read commited_files
 do
@@ -26,19 +25,12 @@ do
         for ((i=0;i<$files_in_commit_count;i++))
         do
             file=${files_in_commit[$i]}
-            file_directory="${file%/*}" #jump to parent directory
-            file_commits_count[$file]=$((${file_commits_count[$file]} + 1))
             next_i=$i+1 
 
             for ((j=$next_i;j<$files_in_commit_count;j++)) 
             do
                 other_file=${files_in_commit[$j]}
-                other_file_directory="${other_file%/*}" #jump to parent directory
-
-                if [ "$file_directory" != "$other_file_directory" ]
-                then
-                    file_pair_commits_count[$file,$other_file]=$((${file_pair_commits_count[$file,$other_file]} + 1))
-                fi
+                file_pair_commits_count[$file,$other_file]=$((${file_pair_commits_count[$file,$other_file]} + 1))
             done
         done
     fi
@@ -49,7 +41,20 @@ do
     shared_commits=${file_pair_commits_count["$pair"]}
 
     if (( $shared_commits >= $min_shared_commits_to_report_pair ))
-    then    
-        echo $pair','$shared_commits',shared commits'
+    then
+        other_file=${pair#*,}
+        equal_chars=0
+
+        for ((i=1;i<=${#other_file};i++))
+        do
+            if [ "${pair:$i-1:1}" == "${other_file:$i-1:1}" ]
+            then
+                equal_chars=$(( $equal_chars+1 ))
+            else
+                i=${#other_file} #break loop
+            fi
+        done
+
+        echo $pair','$shared_commits',shared commits,'$equal_chars'path similarity'
     fi
 done
