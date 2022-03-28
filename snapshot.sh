@@ -15,22 +15,22 @@ done
 i=0
 file_length=0
 file_leading_spaces=0
-file_timestamp=0
+file_commit_count_within_time_span=0
 
-declare -A timestamp_by_dir
+declare -A commit_count_within_time_span_by_dir
 declare -A lines_by_dir
 declare -A leading_spaces_by_dir
 
 if [ $print_raw_data ]
 then
-    echo 'File' 'Lines_count' 'Average_last_modification_timestamp' 'Last_modification_timestamp' 'Leading_spaces'
+    echo 'File' 'Lines_count' 'Commit_count_within_time_span' 'Leading_spaces'
 fi
 
 while read line
 do
-    if (( i % 4 == 0 )) #line with timestamp
+    if (( i % 4 == 0 )) #line with commit count within time span
     then
-        file_timestamp="$line"
+        file_commit_count_within_time_span="$line"
     elif (( i % 4 == 1 )) #line with lines length
     then
         file_length="$line"
@@ -43,20 +43,20 @@ do
 
         if [ $print_raw_data ]
         then
-            echo "$path" $file_length $file_timestamp $file_max_timestamp $file_leading_spaces #report single file data
+            echo "$path" $file_length $file_commit_count_within_time_span $file_leading_spaces #report single file data
         fi
 
         while [[ "$path" == *"/"* ]] #iterate recursively to parent directory
         do
             path="${path%/*}" #jump to parent directory
-            timestamp_by_dir["$path"]=$((${timestamp_by_dir["$path"]} + $file_timestamp * $file_length))
+            commit_count_within_time_span_by_dir["$path"]=$((${commit_count_within_time_span_by_dir["$path"]} + $file_commit_count_within_time_span * $file_length))
             lines_by_dir["$path"]=$((${lines_by_dir["$path"]} + $file_length))
             leading_spaces_by_dir["$path"]=$((${leading_spaces_by_dir["$path"]} + $file_leading_spaces))
         done
     fi
 
     i=$i+1
-done < <(git ls-files "$filter_files" | xargs -I{} sh -c 'git log -1 --format=%ct "{}" ; cat "{}" | wc -l ; grep -o '^[[:blank:]]*' "{}" | tr -d "\n" | wc -c ; echo "{}"')
+done < <(git ls-files "$filter_files" | xargs -I{} sh -c 'git log --after="1 year ago" --oneline "{}" | wc -l ; cat "{}" | wc -l ; grep -o '^[[:blank:]]*' "{}" | tr -d "\n" | wc -c ; echo "{}"')
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #list all files
@@ -111,25 +111,20 @@ then
                 lines_count="${lines_by_dir["${directories_2d_array[$i,$j]}"]}"
                 leading_spaces_per_line=$(( ${leading_spaces_by_dir["${directories_2d_array[$i,$j]}"]} / $lines_count ))
                 leading_spaces_per_line_squared=$(( $leading_spaces_per_line * $leading_spaces_per_line ))
-                directory_age_in_seconds=$(( ${timestamp_by_dir["${directories_2d_array[$i,$j]}"]} / $lines_count ))
-                age_in_seconds=$(( $timestamp - $directory_age_in_seconds ))
-                age_in_days=$(( $age_in_seconds / 86400 ))
-
+                commit_count_within_time_span="${commit_count_within_time_span_by_dir["${directories_2d_array[$i,$j]}"]}"
                 printf "$lines_count"
                 printf ","
                 printf "$leading_spaces_per_line_squared"
                 printf ","
-                printf "$age_in_days"
+                printf "$commit_count_within_time_span"
                 printf "\n"
             fi
         done
     done
 fi
-
 if [ $print_lines ]
 then
     echo '' #break line
-
     for (( j=0; j<=$max_depth; j++ ))
     do 
         for i in $(seq 0 ${#directories_2d_array[@]}) #loop through all columns
