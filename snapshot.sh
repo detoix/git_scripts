@@ -23,7 +23,14 @@ declare -A leading_spaces_by_dir
 
 if [ $print_raw_data ]
 then
-    echo 'File' 'Lines_count' 'Commit_count_within_time_span' 'Leading_spaces'
+    printf "File"
+    printf ","
+    printf "Lines_count"
+    printf ","
+    printf "Commit_count_within_time_span"
+    printf ","
+    printf "Leading_spaces"
+    printf "\n"
 fi
 
 while read line
@@ -43,7 +50,14 @@ do
 
         if [ $print_raw_data ]
         then
-            echo "$path" $file_length $file_commit_count_within_time_span $file_leading_spaces #report single file data
+            printf "$path"
+            printf ","
+            printf "$file_length"
+            printf ","
+            printf "$file_commit_count_within_time_span"
+            printf ","
+            printf "$file_leading_spaces"
+            printf "\n" #report single file data
         fi
 
         while [[ "$path" == *"/"* ]] #iterate recursively to parent directory
