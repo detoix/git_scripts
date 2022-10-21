@@ -34,3 +34,7 @@ When put into an Excel spreadsheet it will look like this:
 | ------------- | ------------- | ----------------------------- | -------------- |
 | src/file.cs   | 17            | 1                             | 52             |
 
+- **File** represents path to file under git version control
+- **Lines_count** simply calculates all lines within file
+- **Commit_count_within_time_span** prints count of commits within a year since now
+- **Leading_spaces** counts all whitespaces appearing before any other character in code (this should more or less represent complexity - the more indentation the more complex the code)
