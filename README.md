@@ -38,3 +38,13 @@ When put into an Excel spreadsheet it will look like this:
 - **Lines_count** simply calculates all lines within file
 - **Commit_count_within_time_span** prints count of commits within a year since now
 - **Leading_spaces** counts all whitespaces appearing before any other character in code (this should more or less represent complexity - the more indentation the more complex the code)
+
+# oneliners
+
+Visit [git mining](https://objectequals.com/git-mining/) plus see some oneliners below:
+
+Prints all files prefixed with number of lines, ordered
+
+```
+git ls-files | xargs -I{} wc -l {} | sort -g -r
+```
