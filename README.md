@@ -42,7 +42,7 @@ When put into an Excel spreadsheet it will look like this:
 Similar result can be achieved with this oneliner:
 
 ```
-git ls-files | xargs -I{} sh -c 'printf "{}\t" ; git log --after="1 year ago" --oneline "{}" | printf "`wc -l`\t" ; cat "{}" | printf "`wc -l`\t" ; grep -o '^[[:blank:]]*' "{}" | tr -d "\n" | wc -c'
+git ls-files *Factory.cs | xargs -I{} sh -c 'printf "{}\t" ; cat "{}" | printf "`wc -l`\t" ; git log --after="1 year ago" --oneline "{}" | printf "`wc -l`\t" ; grep -o '^[[:blank:]]*' "{}" | tr -d "\n" | wc -c'
 ```
 
 # oneliners
