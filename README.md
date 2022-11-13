@@ -39,6 +39,12 @@ When put into an Excel spreadsheet it will look like this:
 - **Commit_count_within_time_span** prints count of commits within a year since now
 - **Leading_spaces** counts all whitespaces appearing before any other character in code (this should more or less represent complexity - the more indentation the more complex the code)
 
+Similar result can be achieved with this oneliner:
+
+```
+git ls-files | xargs -I{} sh -c 'printf "{}\t" ; git log --after="1 year ago" --oneline "{}" | printf "`wc -l`\t" ; cat "{}" | printf "`wc -l`\t" ; grep -o '^[[:blank:]]*' "{}" | tr -d "\n" | wc -c'
+```
+
 # oneliners
 
 Visit [git mining](https://objectequals.com/git-mining/) plus see some oneliners below:
