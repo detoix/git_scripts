@@ -52,5 +52,5 @@ Visit [git mining](https://objectequals.com/git-mining/) plus see some oneliners
 Prints all files prefixed with number of lines, ordered
 
 ```
-git ls-files | xargs -I{} wc -l {} | sort -g -r
+git ls-files | xargs -I{} wc -l '{}' | sort -g -r
 ```
