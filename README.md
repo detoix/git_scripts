@@ -55,7 +55,7 @@ Prints all files prefixed with number of lines, ordered
 git ls-files | xargs -I{} wc -l '{}' | sort -g -r
 ```
 
-Fast count leading spaces in
+Fast count leading spaces
 
 ```
 git ls-files -z | xargs -0 grep -ho '^[[:blank:]]*' | tr -d '\n' | wc -c
