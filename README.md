@@ -58,7 +58,7 @@ git ls-files | xargs -I{} wc -l '{}' | sort -g -r
 Prints all meaningful lines, i.e., lines that have at least one number or letter
 
 ```
-git ls-files | xargs -0 grep '[[:alnum:]]' | wc -l
+git ls-files -z | xargs -0 grep '[[:alnum:]]' | wc -l
 ```
 
 Print tsv, where first column is file path and second column is meaningful lines count in this file
