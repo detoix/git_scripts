@@ -64,7 +64,7 @@ git ls-files | xargs -0 grep '[[:alnum:]]' | wc -l
 Print tsv, where first column is file path and second column is meaningful lines count in this file
 
 ```
-git ls-files -z | xargs -0 -n 1 sh -c 'printf "$0\t" ; cat "$0" | grep "[[:alnum:]]" | wc -l'
+git ls-files -z | xargs -0 -n 1 sh -c 'printf "$0\t" ; grep "[[:alnum:]]" "$0" | wc -l'
 ```
 
 Fast count leading spaces
