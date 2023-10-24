@@ -72,3 +72,9 @@ Fast count leading spaces
 ```
 git ls-files -z | xargs -0 grep -ho '^[[:blank:]]*' | tr -d '\n' | wc -c
 ```
+
+Count all tokens
+
+```
+git ls-files -z | xargs -0 grep -h '[[:alnum:]]' | tr -s '[:space:]' '\n' | wc -l
+```
