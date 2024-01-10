@@ -52,7 +52,7 @@ Visit [git mining](https://objectequals.com/git-mining/) plus see some oneliners
 Prints all files prefixed with number of lines, ordered
 
 ```
-git ls-files | xargs -I{} wc -l '{}' | sort -g -r
+git ls-files -z | xargs -0 wc -l | sort -g -r
 ```
 
 Prints all meaningful lines, i.e., lines that have at least one number or letter
